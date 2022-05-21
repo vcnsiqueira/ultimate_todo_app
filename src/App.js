@@ -1,23 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { doc, setDoc, Timestamp } from 'firebase/firestore';
 
-function App() {
+import { registerUser, db } from './configs/firebase/firebaseConfig';
+
+const App = () => {
+  
+  const handleRegister = async () => { //Initial test
+    console.log('Entrou');
+    registerUser('teste@gmail.com', '123456')
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log(user.uid);
+        setDoc(doc(db, 'users', user.uid), {
+          email: 'teste@gmail.com',
+          registeredAt: Timestamp.fromDate(new Date()),
+        });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        console.log(errorCode);
+      });
+  };
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <button onClick={handleRegister}>
+        Submit
+      </button>
     </div>
   );
 }
