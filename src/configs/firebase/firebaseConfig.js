@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore'
+import { getFirestore, Timestamp } from 'firebase/firestore'
 
 import {
   getAuth,
@@ -44,4 +44,14 @@ export const resetPassword = (email) => {
 export const logoutUser = () => {
   const auth = getAuth();
   signOut(auth);
+};
+
+//### CONVERT FROM DATE TO TIMESTAMP TO FIRESTORE ###//
+export const convertToTimestamp = (date) => {
+  return Timestamp.fromDate(date);
+};
+
+//### CONVERT FROM TIMESTAMP TO DATE FROM FIRESTORE ###//
+export const convertDate = (date) => {
+  return date.toDate().toLocaleString('en-UK', {dateStyle: 'short'});
 };
