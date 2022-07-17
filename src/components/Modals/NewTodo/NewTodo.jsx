@@ -13,12 +13,12 @@ import MenuItem from '@material-ui/core/MenuItem';
 // import { LocalizationProvider } from '@material-ui/lab/LocalizationProvider';
 // import { DesktopDatePicker } from '@material-ui/lab/DesktopDatePicker';
 
-import { convertToTimestamp } from '../../../configs/firebase/firebaseConfig';
+import { convertDate, convertToTimestamp } from '../../../configs/firebase/firebaseConfig';
 
 const NewTodo = ({ isEdit, initialValue, createNewTodo, editTodo, close }) => {
 
-  const [task, setTask] = useState({ value: initialValue.task, error: false, errorMessage: '' });
-  const [dateTarget, setDateTarget] = useState({ value: initialValue.dateTarget, error: false, errorMessage: '' });
+  const [task, setTask] = useState({ value: initialValue.name, error: false, errorMessage: '' });
+  const [dateTarget, setDateTarget] = useState({ value: convertDate(initialValue.dateTarget), error: false, errorMessage: '' });
   const [priority, setPriority] = useState({ value: initialValue.priority, error: false, errorMessage: ''});
 
   const handleTask = (val) => {
@@ -52,11 +52,13 @@ const NewTodo = ({ isEdit, initialValue, createNewTodo, editTodo, close }) => {
     if (!task.error && task.value !== '' && !dateTarget.error && dateTarget.value !== '' && !priority.error && priority.value !== '') {
       const todo = {
         name: task.value,
-        dateTarget: convertToTimestamp(new Date(moment(dateTarget.value, 'DD/MM/YYYY').toDate())),
+        done: false,
         priority: priority.value,
         createdAt: isEdit? initialValue.createdAt : convertToTimestamp(new Date()),
+        dateTarget: convertToTimestamp(new Date(moment(dateTarget.value, 'DD/MM/YYYY').toDate())),
+        dateConclusion: null,
       }
-      isEdit ? await createNewTodo(todo) : await createNewTodo(todo);
+      isEdit ? await editTodo(todo) : await createNewTodo(todo);
       // console.log(todo);
     } else {
       console.log('You cannot execute this action!');

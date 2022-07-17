@@ -110,7 +110,7 @@ export const ListsProvider = ({ children }) => {
   }, [currentUser]);
 
   const addList = useCallback( async (newList) => {
-    const token = await getUid(userObject);  // using this piece of code because sometimes it doesn't work to get the currentUser (it shows null). This is forcing the code to get the user uid
+    const token = await getUid(userObject);
     try {
       await addDoc(collection(db, `users/${token}/todolists`), newList);
       return {

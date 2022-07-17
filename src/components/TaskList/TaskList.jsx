@@ -5,7 +5,7 @@ import { TaskListContainer, List } from './styled/TaskList.styled';
 
 import TaskItem from '../TaskItem/TaskItem';
 
-const TaskList = ({ tasks, deleteTodo }) => {
+const TaskList = ({ tasks, deleteTodo, editTodo, toggleTodoDone }) => {
   return (
     <TaskListContainer>
       {tasks.length === 0 ?
@@ -15,14 +15,22 @@ const TaskList = ({ tasks, deleteTodo }) => {
         <List>
           <thead>
             <tr>
-              <th style={{ width: '40%' }}>Task</th>
-              <th style={{ width: '40%' }}>Priority</th>
+              <th style={{ width: '35%' }}>Task</th>
+              <th style={{ width: '15%' }}>Priority</th>
+              <th style={{ width: '15%' }}>Deadline</th>
+              <th style={{ width: '15%' }}>Status</th>
               <th style={{ width: '20%' }}>Options</th>
             </tr>
           </thead>
           <tbody>
             {tasks.map((task) => (
-              <TaskItem key={task.id} id={task.id} deleteTodo={deleteTodo} priority={task.priority}>
+              <TaskItem 
+                key={task.id}
+                todo={task}
+                deleteTodo={deleteTodo}
+                editTodo={editTodo}
+                toggleTodoDone={toggleTodoDone}
+              >
                 {task.name}
               </TaskItem>
             ))}
@@ -36,11 +44,15 @@ const TaskList = ({ tasks, deleteTodo }) => {
 TaskList.propTypes = {
   tasks: PropTypes.array,
   deleteTodo: PropTypes.func,
+  editTodo: PropTypes.func,
+  toggleTodoDone: PropTypes.func,
 };
 
 TaskList.defaultProps = {
   tasks: [],
   deleteTodo: () => {},
+  editTodo: () => {},
+  toggleTodoDone: () => {},
 };
 
 export default TaskList;

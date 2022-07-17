@@ -11,6 +11,7 @@ import { ModalContext } from '../../context/ModalContext';
 import TodosToolbar from '../../components/Toolbars/TodosToolbar';
 import TaskList from '../../components/TaskList';
 import NewTodo from '../../components/Modals/NewTodo';
+import { convertToTimestamp } from '../../configs/firebase/firebaseConfig';
 
 const TodoList = () => {
   
@@ -58,7 +59,7 @@ const TodoList = () => {
     };
 
     openModal({
-      title: 'Create New Task',
+      title: 'Create New Todo',
       child: (
         <NewTodo
           createNewTodo={addTodo}
@@ -68,29 +69,86 @@ const TodoList = () => {
     });
   }
 
-  const handleDeleteTodo = async (todoId) => {
-    const { error, msg } = await todosAPI.deleteTodo(id, todoId);
-    if (error) {
+  const handleEditTodo = async (todoId) => {
+
+    const initialValue = state.todos.filter(todo => todo.id === todoId)[0];
+
+    const editTodo = async (newTodo) => {
+      const { error, msg } = await todosAPI.editTodo(id, todoId, newTodo);
       openSnackbar(msg, {
-        type: 'error',
+        type: error ? 'error' : 'success',
         duration: 3000,
         position: 'bottom-right',
-        variant: 'filled',
+        variant: 'filled',        
       });
-    } else {
+    };
+
+    openModal({
+      title: 'Edit Todo',
+      child: (
+        <NewTodo
+          isEdit
+          initialValue={initialValue}
+          editTodo={editTodo}
+          close={closeModal}
+        />
+      ),
+    });
+  };
+
+  const handleToggleTodoDone = async (todoId) => {
+    
+    const { done } = state.todos.filter(todo => todo.id === todoId)[0];
+    const newTodo = {
+      done: !done,
+      dateConclusion: !done ? convertToTimestamp(new Date()) : null,
+    };
+    const toggleMsg = !done ? 'Todo marked as done!' : 'Todo marked as not done!'
+    
+    const { error, msg } = await todosAPI.editTodo(id, todoId, newTodo);
+    openSnackbar(error ? msg : toggleMsg, {
+      type: error ? 'error' : 'success',
+      duration: 3000,
+      position: 'bottom-right',
+      variant: 'filled',        
+    });
+   };
+
+  const handleDeleteTodo = async (todoId) => {
+    const deleteTodo = async () => {
+      const { error, msg } = await todosAPI.deleteTodo(id, todoId);
+      if(!error) {
+        closeModal();
+      };
       openSnackbar(msg, {
-        type: 'success',
+        type: error ? 'error' : 'success',
         duration: 3000,
         position: 'bottom-right',
         variant: 'filled',
       });
     };
+
+    openModal({
+      title: 'Remove Todo',
+      yesLabel: 'Remove',
+      noLabel: 'Cancel',
+      onCancel: closeModal,
+      onSubmit: deleteTodo,
+      child: (
+        <div>Are you sure you want to remove this todo? This action can't be undone!</div>
+      )
+    });
   };
   
   return (
     <TodoListContainer>
       <TodosToolbar list={list[0]} tasks={state.todos} addTodo={handleAddTodo}/>
-      <TaskList tasks={state.todos} deleteTodo={handleDeleteTodo} />
+      <TaskList
+        tasks={state.todos}
+        deleteTodo={handleDeleteTodo}
+        editTodo={handleEditTodo}
+        toggleTodoDone={handleToggleTodoDone}
+      />
     </TodoListContainer>
   );
 };

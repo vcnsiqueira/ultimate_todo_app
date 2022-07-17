@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useEffect, useCallback, useMemo, useReducer } from 'react';
+import React, { createContext, useContext, useCallback, useMemo, useReducer } from 'react';
 import { AuthContext } from '../AuthContext';
 import { db } from '../../configs/firebase/firebaseConfig';
-import { collection, doc, deleteDoc, getDoc, getDocs, addDoc } from 'firebase/firestore';
+import { collection, doc, deleteDoc, getDoc, getDocs, addDoc, updateDoc } from 'firebase/firestore';
 import { order } from '../../utils/order';
 
 const initialState = {
@@ -14,7 +14,7 @@ const todosReducer = (state, action) => {
     case 'getTodos': {
       return {
         ...state,
-        todos: action.todos,
+        todos: order(action.todos, true, 'name'),
         isLoading: false,
       }
     }
@@ -32,6 +32,36 @@ const todosReducer = (state, action) => {
       return {
         ...state,
         todos: state.todos.filter((todo) => todo.id !== action.todoId),
+        isLoading: false,
+      }
+    }
+
+    case 'editTodo': {
+      const todosArray = order(state.todos.map((todo) => {
+        if (todo.id === action.todoId) {
+          // const { name, dateTarget, priority } = action.newTodo;
+          // return {
+          //   ...todo,
+          //   name,
+          //   dateTarget,
+          //   priority,
+          // };
+          const newTodo = {...todo, ...action.newTodo};
+          return {
+            ...todo,
+            name: newTodo.name,
+            dateTarget: newTodo.dateTarget,
+            priority: newTodo.priority,
+            done: newTodo.done,
+            dateConclusion: newTodo.dateConclusion,
+            createdAt: newTodo.createdAt,
+          };
+        }
+        return todo;
+      }), true, 'name');
+      return {
+        ...state,
+        todos: todosArray,
         isLoading: false,
       }
     }
@@ -102,7 +132,6 @@ export const TodosProvider = ({ children }) => {
       const docRef = doc(db, `users/${currentUser}/todolists/${todoListId}/tasks`, todoId);
       const docSnap = await getDoc(docRef);
       if (!docSnap.exists) {
-        console.log('oi')
         return { error: true, msg: 'It was not possible to delete this task', raw: ''};
       } else {
         await deleteDoc(docRef)
@@ -110,6 +139,23 @@ export const TodosProvider = ({ children }) => {
       }
     } catch (error) {
       return { error: true, msg: 'It was not possible to delete this task', raw: error};
+    };
+  }, [currentUser]);
+
+  const editTodo = useCallback ( async (todoListId, todoId, newTodo) => {
+    try {
+      await updateDoc(doc(db, `users/${currentUser}/todolists/${todoListId}/tasks/${todoId}`), newTodo);
+      return {
+        error: false,
+        msg: 'Todo successfully updated!',
+        raw: '',
+      };
+    } catch (error) {
+      return {
+        error: true,
+        msg: 'Something went wrong! Please, verify your internet connection and try again!',
+        raw: '',
+      };
     };
   }, [currentUser]);
 
@@ -143,34 +189,32 @@ export const TodosProvider = ({ children }) => {
         return { error, msg, raw };
       }
 
+      case 'editTodo': {
+        setIsLoading(true);
+        const { error, msg, raw } = await editTodo(action.listId, action.todoId, action.newTodo);
+        if (!error) {
+          dispatch({ type: 'editTodo', todoId: action.todoId, newTodo: action.newTodo });
+        }
+        return { error, msg, raw };
+      }
+
       default: {
         dispatch(action);
         return { error: false, msg: '', raw: ''};
       }
     }
-  }, [getTodos, addTodo, deleteTodo]);
+  }, [getTodos, addTodo, deleteTodo, editTodo]);
 
   const todosAPI = useMemo(() => ({
     getTodos: (id) => middleware({ type: 'getTodos', id }),
     addTodo: (listId, newTodo) => middleware({ type: 'addTodo', listId, newTodo }),
     deleteTodo: (listId, todoId) => middleware({ type: 'deleteTodo', listId, todoId }),
+    editTodo: (listId, todoId, newTodo) => middleware({ type: 'editTodo', listId, todoId, newTodo }),
   }), [middleware]);
 
   const contextValue = useMemo(() => ({
     state, todosAPI,
   }), [state, todosAPI]);
-
-  // useEffect(() => {
-  //   // getting todos in the beginning.
-  //   (async () => {
-  //     const { error, todos } = await getTodos();
-  //     if (error) {
-  //       console.log('Failed to get list todos');
-  //     } else {
-  //       dispatch({ type: 'getTodos', todos: todos });
-  //     }
-  //   })();
-  // }, [getTodos]);
 
   return (
     <TodosContext.Provider value={contextValue}>

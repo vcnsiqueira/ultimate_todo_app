@@ -3,33 +3,23 @@ import PropTypes from 'prop-types';
 
 import { BadgeContainer } from './styled/Badge.styled';
 
-const Badge = ({ type }) => {
-
-  const getText = (type) => {
-    switch (type) {
-      case 'low':
-        return 'Low';
-      
-      case 'medium':
-        return 'Medium';
-  
-      case 'high':
-        return 'High';
-      
-      default:
-        break;
-    };
-  }
+const Badge = ({ type, text }) => {
 
   return (
     <BadgeContainer type={type}>
-      {getText(type)}
+      {text}
     </BadgeContainer>
   );
 };
 
 Badge.propTypes = {
-  type: PropTypes.oneOf(['low', 'medium', 'high'])
+  type: PropTypes.oneOf(['success', 'warning', 'error', 'info']),
+  text: PropTypes.string,
+}
+
+Badge.defaultProps = {
+  type: 'success',
+  text: '',
 }
 
 export default Badge;

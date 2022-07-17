@@ -3,17 +3,20 @@ import theme from '../../../utils/theme';
 
 const getColor = (type) => {
   switch (type) {
-    case 'low':
+    case 'success':
       return { color: theme.successLight, border: theme.successDark }
 
-    case 'medium':
+    case 'warning':
       return { color: theme.warningLight, border: theme.warningDark }
 
-    case 'high':
+    case 'error':
       return { color: theme.errorLight, border: theme.errorDark }
 
-    default:
+    case 'info':
       return { color: theme.infoLight, border: theme.infoDark }
+
+    default:
+      return { color: theme.successLight, border: theme.successDark }
   }
 }
 

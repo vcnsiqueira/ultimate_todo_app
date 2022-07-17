@@ -1,6 +1,7 @@
 export { default as Add } from './Add';
 export { default as Burger } from './Burger';
 export { default as Check } from './Check';
+export { default as Close } from './Close';
 export { default as Edit } from './Edit';
 export { default as Logout } from './Logout';
 export { default as Return } from './Return';
