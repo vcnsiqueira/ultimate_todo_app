@@ -53,5 +53,6 @@ export const convertToTimestamp = (date) => {
 
 //### CONVERT FROM TIMESTAMP TO DATE FROM FIRESTORE ###//
 export const convertDate = (date) => {
+  if (date === null) return null;
   return date.toDate().toLocaleString('en-UK', {dateStyle: 'short'});
 };

@@ -11,7 +11,7 @@ import { ModalContext } from '../../context/ModalContext';
 import TodosToolbar from '../../components/Toolbars/TodosToolbar';
 import TaskList from '../../components/TaskList';
 import NewTodo from '../../components/Modals/NewTodo';
-import { convertToTimestamp } from '../../configs/firebase/firebaseConfig';
+import { convertDate, convertToTimestamp } from '../../configs/firebase/firebaseConfig';
 
 const TodoList = () => {
   
@@ -71,7 +71,7 @@ const TodoList = () => {
 
   const handleEditTodo = async (todoId) => {
 
-    const initialValue = state.todos.filter(todo => todo.id === todoId)[0];
+    let initialValue = state.todos.filter(todo => todo.id === todoId)[0];
 
     const editTodo = async (newTodo) => {
       const { error, msg } = await todosAPI.editTodo(id, todoId, newTodo);

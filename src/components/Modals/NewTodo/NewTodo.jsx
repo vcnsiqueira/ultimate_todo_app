@@ -9,6 +9,8 @@ import Button from '../../Button';
 import DialogActions from '@material-ui/core/DialogActions';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import TextField from '@material-ui/core/TextField';
+import { DatePicker } from '@material-ui/lab';
 // import { AdapterDateFns } from '@material-ui/lab/AdapterDateFns';
 // import { LocalizationProvider } from '@material-ui/lab/LocalizationProvider';
 // import { DesktopDatePicker } from '@material-ui/lab/DesktopDatePicker';
@@ -18,7 +20,12 @@ import { convertDate, convertToTimestamp } from '../../../configs/firebase/fireb
 const NewTodo = ({ isEdit, initialValue, createNewTodo, editTodo, close }) => {
 
   const [task, setTask] = useState({ value: initialValue.name, error: false, errorMessage: '' });
-  const [dateTarget, setDateTarget] = useState({ value: convertDate(initialValue.dateTarget), error: false, errorMessage: '' });
+  const [dateTarget, setDateTarget] = useState({
+    value: isEdit ? moment(convertDate(initialValue.dateTarget), 'DD/MM/YYYY').toDate() : new Date(),
+    error: false,
+    errorMessage: '',
+  });
+  console.log(dateTarget.value);
   const [priority, setPriority] = useState({ value: initialValue.priority, error: false, errorMessage: ''});
 
   const handleTask = (val) => {
@@ -37,6 +44,7 @@ const NewTodo = ({ isEdit, initialValue, createNewTodo, editTodo, close }) => {
       error: msg.length !== 0,
       errorMessage: msg,
     });
+    // setDateTarget(val);
   };
 
   const handlePriority = (val) => {
@@ -57,7 +65,7 @@ const NewTodo = ({ isEdit, initialValue, createNewTodo, editTodo, close }) => {
         createdAt: isEdit? initialValue.createdAt : convertToTimestamp(new Date()),
         dateTarget: convertToTimestamp(new Date(moment(dateTarget.value, 'DD/MM/YYYY').toDate())),
         dateConclusion: null,
-      }
+      };
       isEdit ? await editTodo(todo) : await createNewTodo(todo);
       // console.log(todo);
     } else {
@@ -90,7 +98,7 @@ const NewTodo = ({ isEdit, initialValue, createNewTodo, editTodo, close }) => {
         required
       />
       {/* <LocalizationProvider dateAdapter={AdapterDateFns}> */}
-        <Input
+        {/* <Input
           label="Target date"
           variant="outlined"
           value={dateTarget.value}
@@ -101,8 +109,18 @@ const NewTodo = ({ isEdit, initialValue, createNewTodo, editTodo, close }) => {
           onBlur={e => handleDateTarget(e.target.value)}
           fullWidth
           required
-        />
+        /> */}
       {/* </LocalizationProvider> */}
+      <DatePicker 
+        label="Target date"
+        renderInput={(params) => <TextField {...params } fullWidth={true} style={{ marginLeft: '5px' }} />}
+        variant="outlined"
+        value={dateTarget.value}
+        onChange={handleDateTarget}
+        inputFormat="dd/MM/yyyy"
+        fullWidth
+        required
+      />
       <Select
           labelId="demo-simple-select-filled-label"
           id="demo-simple-select-filled"
@@ -112,11 +130,11 @@ const NewTodo = ({ isEdit, initialValue, createNewTodo, editTodo, close }) => {
           placeholder="Date limit to conclude the todo"
           error={priority.error}
           errorMessage={priority.errorMessage}
-          onChange={e => setPriority({ value: e.target.value, error: dateTarget.error, errorMessage: dateTarget.errorMessage })}
+          onChange={e => setPriority({ value: e.target.value, error: priority.error, errorMessage: priority.errorMessage })}
           onBlur={e => handlePriority(e.target.value)}
           fullWidth
           required
-          style={{ margin: '6px 0 0 6px' }}
+          style={{ margin: '10px 0 0 5px'}}
         >
           <MenuItem value={'low'}>Low</MenuItem>
           <MenuItem value={'medium'}>Medium</MenuItem>
@@ -127,7 +145,7 @@ const NewTodo = ({ isEdit, initialValue, createNewTodo, editTodo, close }) => {
           Cancel
         </Button>
         <Button onClick={handleSubmit} autoFocus>
-          Create
+          {isEdit ? 'Save' : 'Create'}
         </Button>
       </DialogActions>
     </div>
@@ -145,8 +163,10 @@ NewTodo.propTypes = {
 NewTodo.defaultProps = {
   isEdit: false,
   initialValue: {
-    task: '',
+    name: '',
     dateTarget: new Date().toLocaleDateString('en-UK'),
+    dateConclusion: null,
+    done: false,
     priority: 'low',
   },
   createNewTodo: () => {},

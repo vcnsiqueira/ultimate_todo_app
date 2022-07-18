@@ -36,7 +36,7 @@ const Input = ({
             fullWidth={fullWidth}
             required={required}
             disabled={disabled}
-            style={{margin: '5px', ...style }}
+            style={{margin: '10px 5px', ...style }}
         />
     );
 };

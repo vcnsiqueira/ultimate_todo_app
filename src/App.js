@@ -15,37 +15,42 @@ import TodoList from './views/TodoList';
 import PrivateRoute from './components/PrivateRoute';
 import Header from './components/Header';
 
+import { LocalizationProvider } from '@material-ui/lab';
+import AdapterDateFns from '@material-ui/lab/AdapterDateFns';
+
 const App = () => {
   return (
-    <AuthProvider>
-      <ListsProvider>
-        <TodosProvider>
-          <ModalProvider>
-            <SnackbarProvider>
-              <Router>
-                <Routes>
-                  <Route exact path="/register" element={<Register />} />
-                  <Route exact path="/login" element={<Login />} />
-                  <Route exact path="/reset" element={<Reset />} />
-                  <Route exact path="/" element={
-                    <PrivateRoute>
-                      <Header />
-                      <Lists />
-                    </PrivateRoute>}
-                  />
-                  <Route exact path="/:id" element={
-                    <PrivateRoute>
-                      <Header />
-                      <TodoList />
-                    </PrivateRoute>}
-                  />
-                </Routes>
-              </Router>
-            </SnackbarProvider>
-          </ModalProvider>
-        </TodosProvider>
-      </ListsProvider>
-    </AuthProvider>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <AuthProvider>
+        <ListsProvider>
+          <TodosProvider>
+            <ModalProvider>
+              <SnackbarProvider>
+                <Router>
+                  <Routes>
+                    <Route exact path="/register" element={<Register />} />
+                    <Route exact path="/login" element={<Login />} />
+                    <Route exact path="/reset" element={<Reset />} />
+                    <Route exact path="/" element={
+                      <PrivateRoute>
+                        <Header />
+                        <Lists />
+                      </PrivateRoute>}
+                    />
+                    <Route exact path="/:id" element={
+                      <PrivateRoute>
+                        <Header />
+                        <TodoList />
+                      </PrivateRoute>}
+                    />
+                  </Routes>
+                </Router>
+              </SnackbarProvider>
+            </ModalProvider>
+          </TodosProvider>
+        </ListsProvider>
+      </AuthProvider>
+    </LocalizationProvider>
   );
 }
 
