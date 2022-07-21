@@ -1,33 +1,56 @@
-import React from 'react';
-import { doc, setDoc, Timestamp } from 'firebase/firestore';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import { registerUser, db } from './configs/firebase/firebaseConfig';
+import { AuthProvider } from './context/AuthContext';
+import { ListsProvider } from './context/ListsContext';
+import { TodosProvider } from './context/TodosContext';
+import { ModalProvider } from './context/ModalContext/ModalContext';
+import { SnackbarProvider } from './context/SnackbarContext';
+
+import Login from './views/Auth/Login';
+import Register from './views/Auth/Register';
+import Reset from './views/Auth/Reset';
+import Lists from './views/Lists/Lists';
+import TodoList from './views/TodoList';
+
+import PrivateRoute from './components/PrivateRoute';
+import Header from './components/Header';
+
+import { LocalizationProvider } from '@material-ui/lab';
+import AdapterDateFns from '@material-ui/lab/AdapterDateFns';
 
 const App = () => {
-  
-  const handleRegister = async () => { //Initial test
-    console.log('Entrou');
-    registerUser('teste@gmail.com', '123456')
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log(user.uid);
-        setDoc(doc(db, 'users', user.uid), {
-          email: 'teste@gmail.com',
-          registeredAt: Timestamp.fromDate(new Date()),
-        });
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        console.log(errorCode);
-      });
-  };
-  
   return (
-    <div>
-      <button onClick={handleRegister}>
-        Submit
-      </button>
-    </div>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <AuthProvider>
+        <ListsProvider>
+          <TodosProvider>
+            <ModalProvider>
+              <SnackbarProvider>
+                <Router>
+                  <Routes>
+                    <Route exact path="/register" element={<Register />} />
+                    <Route exact path="/login" element={<Login />} />
+                    <Route exact path="/reset" element={<Reset />} />
+                    <Route exact path="/" element={
+                      <PrivateRoute>
+                        <Header />
+                        <Lists />
+                      </PrivateRoute>}
+                    />
+                    <Route exact path="/:id" element={
+                      <PrivateRoute>
+                        <Header />
+                        <TodoList />
+                      </PrivateRoute>}
+                    />
+                  </Routes>
+                </Router>
+              </SnackbarProvider>
+            </ModalProvider>
+          </TodosProvider>
+        </ListsProvider>
+      </AuthProvider>
+    </LocalizationProvider>
   );
 }
 
