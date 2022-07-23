@@ -22,11 +22,13 @@ const ListCard = ({ id, title, date, type, removeList, editList }) => {
 
   return (
     <Card style={{
-      minWidth: '200px',
-      maxWidth: '300px',
+      minWidth: '230px',
+      maxWidth: '350px',
       height: '120px',
-      backgroundColor: '#F5F5F5',
+      backgroundColor: '#CFD2CF',
       cursor: 'pointer',
+      borderRadius: '20px',
+      // border: '1px solid',
     }}
       onClick={() => navigate(`/${id}`)}
     >
@@ -40,6 +42,7 @@ const ListCard = ({ id, title, date, type, removeList, editList }) => {
           component="div"
           style={{ 
             color: '#243A73',
+            fontFamily: 'Trebuchet MS',
             fontSize: '20px',
             fontWeight: 'bold',
             textAlign: 'center',

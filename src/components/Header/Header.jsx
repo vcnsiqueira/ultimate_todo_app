@@ -21,7 +21,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 
 // import ProfileModal from '../Modals/ProfileModal';
 
-import { Burger, User, Logout } from '../icons';
+import { Burger, Logout } from '../icons';
 
 const Header = () => {
   
@@ -29,7 +29,7 @@ const Header = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   // const [openProfileModal, setOpenProfileModal] = useState(false);
 
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, userObject } = useContext(AuthContext);
   const { openSnackbar } = useContext(SnackbarContext);
 
   const navigate = useNavigate();
@@ -121,10 +121,10 @@ const Header = () => {
               </div>
               <Box style={{ display: 'flex', gap: '15px' }}>
                 {location.pathname === '/' ? 
-                  <Link to='/' style={{ color: '#FBCB0A', fontWeight: 'bold', textDecoration: 'none' }}>
+                  <Link to='/' style={{ color: '#FF9F29', fontWeight: 'bold', textDecoration: 'none' }}>
                     Home
                   </Link> :
-                  <Link to='/' style={{ color: '#FBCB0A', fontWeight: 'bold', textDecoration: 'none' }}>
+                  <Link to='/' style={{ color: '#FF9F29', fontWeight: 'bold', textDecoration: 'none' }}>
                     Home
                   </Link>
                 }
@@ -132,14 +132,16 @@ const Header = () => {
             </LeftSideToolbar>
             <Box>
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar />
+                <Avatar style={{ backgroundColor: '#FF9F29' }}>
+                  {userObject.email.substring(0,1).toUpperCase()}
+                </Avatar>
               </IconButton>
               <Popover
                 sx={{ mt: '45px' }}
                 id='menu-appbar'
                 anchorEl={anchorElUser}
                 anchorOrigin={{
-                  vertical: 'bottom',
+                  vertical: 'top',
                   horizontal: 'right',
                 }}
                 keepMounted
@@ -150,14 +152,6 @@ const Header = () => {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                <MenuItem onClick={() => { console.log('Profile modal' )}}>
-                  <ListItemIcon>
-                    <User color='#C4C4C4' />
-                  </ListItemIcon>
-                  <ListItemText>
-                    Perfil
-                  </ListItemText>
-                </MenuItem>
                 <MenuItem onClick={() => { handleSignout(); handleCloseUserMenu(); }}>
                   <ListItemIcon>
                     <Logout color='#C4C4C4' />

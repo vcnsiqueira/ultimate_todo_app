@@ -6,7 +6,7 @@ import { BadgeContainer } from './styled/Badge.styled';
 const Badge = ({ type, text }) => {
 
   return (
-    <BadgeContainer type={type}>
+    <BadgeContainer type={type} style={{ opacity: '0.7' }}>
       {text}
     </BadgeContainer>
   );

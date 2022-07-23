@@ -21,11 +21,11 @@ export const List = styled.table`
   width: 100%;
   padding: 0px;
 
-  tr:nth-child(odd) {
+  tr:nth-child(even) {
     background-color: #E3F2FD;
   }
 
-  tr:nth-child(even) {
+  tr:nth-child(odd) {
     background-color: #FFFFFF;
   }
 `;

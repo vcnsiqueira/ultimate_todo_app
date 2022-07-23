@@ -4,8 +4,6 @@ import { db } from '../../configs/firebase/firebaseConfig';
 import { addDoc, collection, getDocs, query, orderBy, doc, writeBatch, updateDoc } from 'firebase/firestore';
 import { order } from '../../utils/order';
 
-const getUid = async (u) => u.uid;
-
 const initialState = {
   isLoading: false,
   lists: [],
@@ -76,7 +74,7 @@ export const ListsContext = createContext();
 export const ListsProvider = ({ children }) => {
 
   const [state, dispatch] = useReducer(listsReducer, initialState);
-  const { currentUser, userObject } = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
 
   const setIsLoading = useCallback((l = true) => dispatch({ type: 'setIsLoading', isLoading: l }), []);
 
@@ -110,9 +108,9 @@ export const ListsProvider = ({ children }) => {
   }, [currentUser]);
 
   const addList = useCallback( async (newList) => {
-    const token = await getUid(userObject);
+    // const token = await getUid(userObject);
     try {
-      await addDoc(collection(db, `users/${token}/todolists`), newList);
+      await addDoc(collection(db, `users/${currentUser}/todolists`), newList);
       return {
         error: false,
         msg: 'New list successfully created!',
@@ -128,16 +126,16 @@ export const ListsProvider = ({ children }) => {
   }, [currentUser]);
 
   const removeList = useCallback( async (id) => {
-    const token = await getUid(userObject);
+    // const token = await getUid(userObject);
     try {
       const batch = writeBatch(db);
-      const querySnapshot = await getDocs(collection(db, `users/${token}/todolists/${id}/tasks`));
+      const querySnapshot = await getDocs(collection(db, `users/${currentUser}/todolists/${id}/tasks`));
       if (!querySnapshot.empty) {
         querySnapshot.forEach((docId) => {
-          batch.delete(doc(db, `users/${token}/todolists/${id}/tasks`, docId.id))
+          batch.delete(doc(db, `users/${currentUser}/todolists/${id}/tasks`, docId.id))
         })
       };
-      batch.delete(doc(db, `users/${token}/todolists`, id));
+      batch.delete(doc(db, `users/${currentUser}/todolists`, id));
       await batch.commit();
       return {
         error: false,
@@ -154,9 +152,9 @@ export const ListsProvider = ({ children }) => {
   }, [currentUser]);
 
   const editList = useCallback ( async (id, newData) => {
-    const token = await getUid(userObject);
+    // const token = await getUid(userObject);
     try {
-      await updateDoc(doc(db, `users/${token}/todolists/${id}`), newData);
+      await updateDoc(doc(db, `users/${currentUser}/todolists/${id}`), newData);
       return {
         error: false,
         msg: 'List successfully updated!',
